@@ -88,9 +88,32 @@ def say_hello(request):
         # queryset = OrderItem.objects.values('product_id').distinct() 
 
         # Select products that have been ordered and sort by title
-        queryset = Product.objects.filter(
-                id__in=OrderItem.objects.values('product_id').distinct()
-        ).order_by('title')
+        # queryset = Product.objects.filter(
+        #         id__in=OrderItem.objects.values('product_id').distinct()
+        # ).order_by('title')
         
 
-        return render(request, 'hello.html', {'name':'Ted', 'products': list(queryset)})
+        """Deferring fields"""
+        # Get all products don't defer the description and last_update fields
+        # queryset = Product.objects.only('id', 'title')
+
+        # Get all products but defer the description and last_update fields
+        # queryset = Product.objects.defer('description', 'last_update')
+
+        """Selecting related objects"""
+        # Using select_related (1) to fetch the related collection for each product in a single query
+        queryset = Product.objects.select_related('collection').all()
+
+        # Using prefetch_related (n) to fetch the related order items for each product in a single query
+        queryset = Product.objects.prefetch_related(
+                'promotions').select_related('collection').all()
+
+        # Get last 5 orders with customer and items (including product)
+        queryset = Order.objects.select_related(
+                'customer').prefetch_related('orderitem_set__product').order_by('-placed_at')[:5]
+
+
+        return render(request, 'hello.html', {'name':'Ted', 'orders': list(queryset)})
+
+
+
