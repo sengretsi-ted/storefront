@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, F # for complex queries using OR, AND, NOT
+from django.db.models import Count, Min, Max, Avg, Sum # for aggregations
 from store.models import Customer, Product, Collection, Order, OrderItem
 
 # # using the render function to render a template
@@ -102,18 +103,39 @@ def say_hello(request):
 
         """Selecting related objects"""
         # Using select_related (1) to fetch the related collection for each product in a single query
-        queryset = Product.objects.select_related('collection').all()
+        # queryset = Product.objects.select_related('collection').all()
 
         # Using prefetch_related (n) to fetch the related order items for each product in a single query
-        queryset = Product.objects.prefetch_related(
-                'promotions').select_related('collection').all()
+        # queryset = Product.objects.prefetch_related(
+                # 'promotions').select_related('collection').all()
 
         # Get last 5 orders with customer and items (including product)
-        queryset = Order.objects.select_related(
-                'customer').prefetch_related('orderitem_set__product').order_by('-placed_at')[:5]
+        # queryset = Order.objects.select_related(
+                # 'customer').prefetch_related('orderitem_set__product').order_by('-placed_at')[:5]
 
+        """Aggregating Objects"""
+        # result = Product.objects.aggregate(
+        #         count = Count('id'), min_price = Min('unit_price'))
 
-        return render(request, 'hello.html', {'name':'Ted', 'orders': list(queryset)})
+        # number of products in each collection
+        result = Product.objects.aggregate(count = Count('id'))
+
+        # number of orders 
+        result = Order.objects.aggregate(orders = Count('id'))
+
+        # number of units of product 1 sold
+        result = OrderItem.objects.filter(product_id=1).aggregate(units_sold = Sum('quantity'))
+
+        # total orders placed by customer 1
+        result = Order.objects.filter(customer_id=1).aggregate(orders_placed = Count('id'))
+
+        result = Product.objects.filter(collection=3).aggregate(
+                min_price = Min('unit_price'),
+                max_price = Max('unit_price'),
+                average_price = Avg('unit_price')
+        )
+
+        return render(request, 'hello.html', {'name':'Ted', 'result': result})
 
 
 
