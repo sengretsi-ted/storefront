@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, F # for complex queries using OR, AND, NOT
 from django.db.models import Count, Min, Max, Avg, Sum # for aggregations
-from django.db.models import Value, F # for annotations
+from django.db.models import Value, F, Func # for annotations
+from django.db.models.functions import Concat # for concatenating fields in annotations
 from store.models import Customer, Product, Collection, Order, OrderItem
 
 # # using the render function to render a template
@@ -138,9 +139,25 @@ def say_hello(request):
 
 
         """Annotating Objects"""
-        queryset = Customer.objects.annotate(is_new = Value(True))
+        # queryset = Customer.objects.annotate(is_new = Value(True))
 
-        queryset = Customer.objects.annotate(new_id=F('id') + 1)
+        # queryset = Customer.objects.annotate(new_id=F('id') + 1)
+
+        """Calling Database Functions"""
+        # queryset = Customer.objects.annotate(
+        #         # CONCAT
+        #         full_name=Func(F('first_name'), Value(' '), F('last_name'), function='CONCAT')
+        # )
+
+        # queryset = Customer.objects.annotate(
+        #         full_name = Concat('first_name', Value(' '), 'last_name')
+        # )
+
+        """Grouping Data"""
+        queryset = Customer.objects.annotate(
+                orders_count=Count('order')
+        )
+
 
 
         return render(request, 'hello.html', {'name':'Ted', 'result': list(queryset)})
