@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, F # for complex queries using OR, AND, NOT
 from django.db.models import Count, Min, Max, Avg, Sum # for aggregations
+from django.db.models import Value, F # for annotations
 from store.models import Customer, Product, Collection, Order, OrderItem
 
 # # using the render function to render a template
@@ -118,24 +119,31 @@ def say_hello(request):
         #         count = Count('id'), min_price = Min('unit_price'))
 
         # number of products in each collection
-        result = Product.objects.aggregate(count = Count('id'))
+        # result = Product.objects.aggregate(count = Count('id'))
 
         # number of orders 
-        result = Order.objects.aggregate(orders = Count('id'))
+        # result = Order.objects.aggregate(orders = Count('id'))
 
         # number of units of product 1 sold
-        result = OrderItem.objects.filter(product_id=1).aggregate(units_sold = Sum('quantity'))
+        # result = OrderItem.objects.filter(product_id=1).aggregate(units_sold = Sum('quantity'))
 
         # total orders placed by customer 1
-        result = Order.objects.filter(customer_id=1).aggregate(orders_placed = Count('id'))
+        # result = Order.objects.filter(customer_id=1).aggregate(orders_placed = Count('id'))
 
-        result = Product.objects.filter(collection=3).aggregate(
-                min_price = Min('unit_price'),
-                max_price = Max('unit_price'),
-                average_price = Avg('unit_price')
-        )
+        # result = Product.objects.filter(collection=3).aggregate(
+        #         min_price = Min('unit_price'),
+        #         max_price = Max('unit_price'),
+        #         average_price = Avg('unit_price')
+        # )
 
-        return render(request, 'hello.html', {'name':'Ted', 'result': result})
+
+        """Annotating Objects"""
+        queryset = Customer.objects.annotate(is_new = Value(True))
+
+        queryset = Customer.objects.annotate(new_id=F('id') + 1)
+
+
+        return render(request, 'hello.html', {'name':'Ted', 'result': list(queryset)})
 
 
 
