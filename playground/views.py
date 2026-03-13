@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q, F # for complex queries using OR, AND, NOT
+from django.db.models import Q, F, DecimalField # for complex queries using OR, AND, NOT
 from django.db.models import Count, Min, Max, Avg, Sum # for aggregations
-from django.db.models import Value, F, Func # for annotations
+from django.db.models import Value, F, Func, ExpressionWrapper # for annotations
 from django.db.models.functions import Concat # for concatenating fields in annotations
 from store.models import Customer, Product, Collection, Order, OrderItem
 
@@ -154,9 +154,37 @@ def say_hello(request):
         # )
 
         """Grouping Data"""
-        queryset = Customer.objects.annotate(
-                orders_count=Count('order')
-        )
+        # queryset = Customer.objects.annotate(
+        #         orders_count=Count('order')
+        # )
+
+        """Working with Expression Wrappers"""
+        # discounted_price = ExpressionWrapper(
+        #         F('unit_price') * 0.8, output_field=DecimalField())
+        # queryset = Product.objects.annotate(
+        #         discounted_price=discounted_price
+        # )
+
+        # customers with their last order ID
+        # queryset = Customer.objects.annotate(last_order_id=Max('order__id'))
+
+        # Collections and count of their products
+        # queryset = Collection.objects.annotate(products_count=Count('product'))
+        
+        # Customers with more than 5 orders
+        # queryset = Customer.objects.annotate(
+        #         orders_count=Count('order')).filter(orders_count__gt=5)
+
+        # Customers and the total amount they've spent
+        # queryset = Customer.objects.annotate(
+        #     total_spent=Sum(F('order__orderitem__quantity') * F('order__orderitem__unit_price'))
+        # )
+
+        # Top 5 products by total sales
+        # queryset = Product.objects.annotate(
+        #         total_sales=Sum(F('orderitem__quantity')*F('orderitem__unit_price'))
+        # ).order_by('-total_sales')[:5]
+
 
 
 
