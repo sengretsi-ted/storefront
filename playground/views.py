@@ -1,4 +1,8 @@
 from django.shortcuts import render
+from django.contrib.contenttypes.models import ContentType
+from store.models import Product
+from tags.models import TaggedItem
+
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q, F, DecimalField # for complex queries using OR, AND, NOT
@@ -185,6 +189,15 @@ def say_hello(request):
         #         total_sales=Sum(F('orderitem__quantity')*F('orderitem__unit_price'))
         # ).order_by('-total_sales')[:5]
 
+        """Querying Generic Relationships"""
+        content_type = ContentType.objects.get_for_model(Product)
+
+        queryset = TaggedItem.objects \
+        .select_related('tag') \
+        .filter(
+                content_type=content_type,
+                object_id=1,
+        )
 
 
 

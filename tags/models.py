@@ -8,14 +8,11 @@ class Tag(models.Model):
 
 
 class TaggedItem(models.Model):
-    # What tag applied to what object
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    # Type (product, video, article, etc)
-    # ID of the tagged object
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE) #ContentType is a model that Django provides to keep track of all the models in the project and has been decoupled from store app
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-
+    
 
 
 
