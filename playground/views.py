@@ -198,15 +198,22 @@ def say_hello(request):
         # queryset[0] # This will use the cached results and not hit the database again
 
         """Creating Objects"""
-        collection = Collection()
-        collection.title = 'Video Games'
-        collection.featured_product = Product(pk=1)
-        collection.save()
+        # collection = Collection(pk=12)
+        # collection.title = 'Games'
+        # collection.featured_product = None
+        # collection.save()
+
+
+        """Updating Objects"""
+        # collection = Collection.objects.get(pk=12)
+        # collection.featured_product = None
+        # collection.save()
+
+        Collection.objects.filter(pk=12).update(featured_product=None)
 
 
 
-
-        return render(request, 'hello.html', {'name':'Ted', 'result': collection})
+        return render(request, 'hello.html', {'name':'Ted'})
 
 
 
