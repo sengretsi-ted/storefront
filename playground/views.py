@@ -193,12 +193,20 @@ def say_hello(request):
         # TaggedItem.objects.get_tags_for('product', 1)
 
         """Understanding QuerySet Cache"""
-        queryset = Product.objects.all()
-        list(queryset) # This will execute the query and cache the results
-        queryset[0] # This will use the cached results and not hit the database again
+        # queryset = Product.objects.all()
+        # list(queryset) # This will execute the query and cache the results
+        # queryset[0] # This will use the cached results and not hit the database again
+
+        """Creating Objects"""
+        collection = Collection()
+        collection.title = 'Video Games'
+        collection.featured_product = Product(pk=1)
+        collection.save()
 
 
-        return render(request, 'hello.html', {'name':'Ted', 'result': list(queryset)})
+
+
+        return render(request, 'hello.html', {'name':'Ted', 'result': collection})
 
 
 
