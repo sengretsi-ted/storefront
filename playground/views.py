@@ -190,15 +190,12 @@ def say_hello(request):
         # ).order_by('-total_sales')[:5]
 
         """Querying Generic Relationships"""
-        content_type = ContentType.objects.get_for_model(Product)
+        # TaggedItem.objects.get_tags_for('product', 1)
 
-        queryset = TaggedItem.objects \
-        .select_related('tag') \
-        .filter(
-                content_type=content_type,
-                object_id=1,
-        )
-
+        """Understanding QuerySet Cache"""
+        queryset = Product.objects.all()
+        list(queryset) # This will execute the query and cache the results
+        queryset[0] # This will use the cached results and not hit the database again
 
 
         return render(request, 'hello.html', {'name':'Ted', 'result': list(queryset)})
