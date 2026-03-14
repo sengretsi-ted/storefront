@@ -15,6 +15,7 @@ from django.db.models import Value, F, Func, ExpressionWrapper # for annotations
 from django.db.models.functions import Concat # for concatenating fields in annotations
 
 from django.db import transaction
+from django.db import connection
 
 # # using the render function to render a template
 # def say_hello(request):
@@ -237,20 +238,27 @@ def say_hello(request):
         # cart.delete()
  
         """Transactions"""
-        with transaction.atomic():
-            order = Order()
-            order.customer_id = 1
-            order.save()
+        # with transaction.atomic():
+        #     order = Order()
+        #     order.customer_id = 1
+        #     order.save()
 
-            item = OrderItem()
-            item.order = order
-            item.product_id = 1
-            item.quantity = 1
-            item.unit_price = 10
-            item.save()
+        #     item = OrderItem()
+        #     item.order = order
+        #     item.product_id = 1
+        #     item.quantity = 1
+        #     item.unit_price = 10
+        #     item.save()
 
+        """Executing Raw SQL Queries"""
+        # queryset = Product.objects.raw('SELECT * FROM store_product')
 
-        return render(request, 'hello.html', {'name':'Ted', 'order': order, 'item': item})
+        # with connection.cursor() as cursor:
+            # cursor.execute('SELECT * FROM store_product') # executing a raw SQL query
+            # cursor.callproc('get_customer_orders', [1, 2, 'a']) # calling a stored procedure with parameters
+            
+
+        return render(request, 'hello.html', {'name':'Ted', 'results': list(queryset)})
 
 
 
