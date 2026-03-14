@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.contrib.contenttypes.models import ContentType
-from store.models import Product
+from store.models import Cart, CartItem, Product
 from tags.models import TaggedItem
 
 from django.http import HttpResponse
@@ -209,11 +209,30 @@ def say_hello(request):
         # collection.featured_product = None
         # collection.save()
 
-        Collection.objects.filter(pk=12).update(featured_product=None)
+        # Collection.objects.filter(pk=12).update(featured_product=None)
 
+        """Deleting Objects"""
+        # Create a shopping cart with an item
+        cart = Cart()
+        cart.save()
 
+        item1 = CartItem()
+        item1.cart = cart
+        item1.product_id = 1
+        item1.quantity = 1
+        item1.save()
 
-        return render(request, 'hello.html', {'name':'Ted'})
+        # Updating the quantity of an item
+        item1 = CartItem.objects.get(pk=item1.pk)
+        item1.quantity = 2
+        item1.save()
+
+        # Removing an item from the cart
+        cart = Cart(pk=1)
+        cart.delete()
+ 
+
+        return render(request, 'hello.html', {'name':'Ted'}, {'cart': cart})
 
 
 
