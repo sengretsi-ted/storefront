@@ -1,15 +1,20 @@
 from django.shortcuts import render
 from django.contrib.contenttypes.models import ContentType
+
 from store.models import Cart, CartItem, Product
+from store.models import Customer, Product, Collection, Order, OrderItem
+
 from tags.models import TaggedItem
 
 from django.http import HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
+
 from django.db.models import Q, F, DecimalField # for complex queries using OR, AND, NOT
 from django.db.models import Count, Min, Max, Avg, Sum # for aggregations
 from django.db.models import Value, F, Func, ExpressionWrapper # for annotations
 from django.db.models.functions import Concat # for concatenating fields in annotations
-from store.models import Customer, Product, Collection, Order, OrderItem
+
+from django.db import transaction
 
 # # using the render function to render a template
 # def say_hello(request):
@@ -213,26 +218,39 @@ def say_hello(request):
 
         """Deleting Objects"""
         # Create a shopping cart with an item
-        cart = Cart()
-        cart.save()
+        # cart = Cart()
+        # cart.save()
 
-        item1 = CartItem()
-        item1.cart = cart
-        item1.product_id = 1
-        item1.quantity = 1
-        item1.save()
+        # item1 = CartItem()
+        # item1.cart = cart
+        # item1.product_id = 1
+        # item1.quantity = 1
+        # item1.save()
 
-        # Updating the quantity of an item
-        item1 = CartItem.objects.get(pk=item1.pk)
-        item1.quantity = 2
-        item1.save()
+        # # Updating the quantity of an item
+        # item1 = CartItem.objects.get(pk=item1.pk)
+        # item1.quantity = 2
+        # item1.save()
 
-        # Removing an item from the cart
-        cart = Cart(pk=1)
-        cart.delete()
+        # # Removing an item from the cart
+        # cart = Cart(pk=1)
+        # cart.delete()
  
+        """Transactions"""
+        with transaction.atomic():
+            order = Order()
+            order.customer_id = 1
+            order.save()
 
-        return render(request, 'hello.html', {'name':'Ted'}, {'cart': cart})
+            item = OrderItem()
+            item.order = order
+            item.product_id = 1
+            item.quantity = 1
+            item.unit_price = 10
+            item.save()
+
+
+        return render(request, 'hello.html', {'name':'Ted', 'order': order, 'item': item})
 
 
 
