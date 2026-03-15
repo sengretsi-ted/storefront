@@ -11,6 +11,12 @@ class Promotion(models.Model):
 class Collection(models.Model):
     title = models.CharField(max_length=255) #varchar(255)
     featured_product = models.ForeignKey('Product', on_delete=models.SET_NULL, null=True, related_name='+') #foreign key to Product, with set null on delete, and no reverse relation
+    
+    def __str__(self) -> str:
+        return self.title
+    class Meta:
+        ordering = ['title'] #ordering by title in ascending order, use '-title' for descending order
+
 
 class Product(models.Model):
     title = models.CharField(max_length=255) #varchar(255)
@@ -22,6 +28,10 @@ class Product(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT) #foreign key to Collection, with protect delete so a deleted collection will not delete the products in it, but will raise an error instead
     promotions = models.ManyToManyField(Promotion) #many to many relationship with Promotion
 
+    def __str__(self) -> str:
+        return self.title
+    class Meta:
+        ordering = ['title'] #ordering by title in ascending order, use '-title' for descending order
 
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
