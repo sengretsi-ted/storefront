@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 # Create your models here.
@@ -21,12 +22,16 @@ class Collection(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=255) #varchar(255)
     slug = models.SlugField()
-    description = models.TextField() #text
-    unit_price = models.DecimalField(max_digits=6, decimal_places=2) #decimal(10,2)  # 9999.99 as a sample number
-    inventory = models.IntegerField() #int
+    description = models.TextField(null=True, blank=True) #text
+    unit_price = models.DecimalField(
+        max_digits=6, 
+        decimal_places=2,
+        validators=[MinValueValidator(1)]
+        ) 
+    inventory = models.IntegerField(validators=[MinValueValidator(0)]) #int
     last_update = models.DateTimeField(auto_now=True) #datetime
     collection = models.ForeignKey(Collection, on_delete=models.PROTECT) #foreign key to Collection, with protect delete so a deleted collection will not delete the products in it, but will raise an error instead
-    promotions = models.ManyToManyField(Promotion) #many to many relationship with Promotion
+    promotions = models.ManyToManyField(Promotion, blank=True) #many to many relationship with Promotion
 
     def __str__(self) -> str:
         return self.title
@@ -51,10 +56,10 @@ class Customer(models.Model):
     birth_date = models.DateField(null=True) #date
     membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=MEMBERSHIP_BRONZE) #char(1)
     
-    def __str__(self) -> str:
-        return self.first_name + ' ' + self.last_name
-    class Meta:
-        ordering = ['first_name', 'last_name']
+    # def __str__(self) -> str:
+    #     return self.first_name + ' ' + self.last_name
+    # class Meta:
+    #     ordering = ['first_name', 'last_name']
 
 class Order(models.Model):
     PAYMENT_STATUS_PENDING = 'P'
