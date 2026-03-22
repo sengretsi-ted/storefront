@@ -29,6 +29,7 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {
         'slug': ['title']
     }
+    search_fields = ['title']
 
     actions = ['clear_inventory']
     list_display = ['title','unit_price','inventory_status', 'collection_title']
@@ -56,10 +57,18 @@ class ProductAdmin(admin.ModelAdmin):
         ) 
 
 
+class OrderItemInline(admin.StackedInline):
+    autocomplete_fields = ['product']
+    min_num = 1
+    max_num = 10
+    model = models.OrderItem
+    extra = 0
+
 # Setup Orders and Customers in the admin site
 @admin.register(models.Order)
 class OrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ['customer']
+    inlines = [OrderItemInline]
     list_display = ['id', 'placed_at', 'customer']
 
 
