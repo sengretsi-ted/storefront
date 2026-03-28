@@ -4,6 +4,7 @@ from . import views
 # URLConf for playground app
 urlpatterns = [
     path('products/', views.product_list),
-    path('products/<int:id>/', views.product_detail)
+    path('products/<int:id>/', views.product_detail),
+    path('collection/<int:pk>/', views.collection_detail, name='collection-detail')
 ]
 
