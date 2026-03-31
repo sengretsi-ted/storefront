@@ -15,11 +15,16 @@ class CollectionSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ['id', 'title', 'unit_price', 'price_with_tax', 'collection']
+        fields = ['id', 'title','description', 'slug', 'inventory', 'unit_price', 'price_with_tax', 'collection']
     
     price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
 
-    # id = serializers.IntegerField()
+    def calculate_tax(self, product: Product):
+        return product.unit_price * Decimal(1.1)
+    
+
+
+ # id = serializers.IntegerField()
     # title = serializers.CharField(max_length=255)
     # price = serializers.DecimalField(max_digits=6, decimal_places=2, source='unit_price')
     # collection = serializers.HyperlinkedRelatedField(
@@ -32,10 +37,5 @@ class ProductSerializer(serializers.ModelSerializer):
     # collection = serializers.PrimaryKeyRelatedField(
     #     queryset=Collection.objects.all()
     # )
-    
 
-
-
-    def calculate_tax(self, product: Product):
-        return product.unit_price * Decimal(1.1)
 
